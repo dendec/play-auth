@@ -1,0 +1,21 @@
+@(loginForm: Form[LoginForm])(implicit messages: Messages)
+
+@import helper._
+
+@main("Login") {
+    <div class="container">
+        <form class="form-signin" action="@routes.Application.auth()">
+            <h2 class="form-signin-heading">Please sign in</h2>
+            @inputText(loginForm("email"), 'class -> "input-block-level")
+            @inputPassword(loginForm("password"), 'class -> "input-block-level")
+            <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+        </form>
+    </div>
+    @if(loginForm.hasGlobalErrors) {
+        <ul>
+            @loginForm.globalErrors.foreach { error =>
+                <li>error.message</li>
+            }
+        </ul>
+    }
+}
