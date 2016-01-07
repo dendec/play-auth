@@ -1,21 +1,20 @@
-@(loginForm: Form[LoginForm])(implicit messages: Messages)
+@(loginForm: Form[LoginFormEntity])(implicit messages: Messages)
 
 @import helper._
 
 @main("Login") {
     <div class="container">
         <form class="form-signin" action="@routes.Application.auth()">
-            <h2 class="form-signin-heading">Please sign in</h2>
-            @inputText(loginForm("email"), 'class -> "input-block-level")
-            @inputPassword(loginForm("password"), 'class -> "input-block-level")
+            <h2 class="form-signin-heading">Login:</h2>
+            @inputText(loginForm("email"), 'class -> "form-control", 'type -> "email")
+            @inputPassword(loginForm("password"), 'class -> "form-control", 'type -> "password", 'required -> "")
             <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+            <a href="@routes.Application.register()">Register</a>
+            @if(loginForm.hasGlobalErrors) {
+            <p>
+                @loginForm.globalErrors.head.message
+            </p>
+            }
         </form>
     </div>
-    @if(loginForm.hasGlobalErrors) {
-        <ul>
-            @loginForm.globalErrors.foreach { error =>
-                <li>error.message</li>
-            }
-        </ul>
-    }
 }

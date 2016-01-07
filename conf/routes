@@ -3,11 +3,12 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-GET     /home                       controllers.Application.home
+GET     /                           controllers.Application.home
 GET     /login                      controllers.Application.login
 GET     /auth                       controllers.Application.auth
 GET     /logout                     controllers.Application.logout
+GET     /register                   controllers.Application.register
+POST    /register                   controllers.Application.register
 POST    /api/user/create            controllers.UserController.create
 POST    /api/user/update/:id        controllers.UserController.update(id: Int)
 GET     /api/user/:id               controllers.UserController.read(id: Int)
