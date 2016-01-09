@@ -1,15 +1,15 @@
-@(loginForm: Form[LoginFormEntity])(implicit messages: Messages)
+@(loginForm: Form[LoginEntity])(implicit messages: Messages)
 
 @import helper._
 
 @main("Login") {
     <div class="container">
-        <form class="form-signin" action="@routes.Application.auth()">
+        <form class="form-signin" action="@routes.LoginController.auth()">
             <h2 class="form-signin-heading">Login:</h2>
             @inputText(loginForm("email"), 'class -> "form-control", 'type -> "email")
             @inputPassword(loginForm("password"), 'class -> "form-control", 'type -> "password", 'required -> "")
             <button class="btn btn-large btn-primary" type="submit">Sign in</button>
-            <a href="@routes.Application.register()">Register</a>
+            <a href="@routes.RegistrationController.register()">Register</a>
             @if(loginForm.hasGlobalErrors) {
             <p>
                 @loginForm.globalErrors.head.message

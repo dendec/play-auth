@@ -3,7 +3,6 @@ package model
 import play.api.db.DB
 import play.api.Play.current
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import slick.driver.H2Driver.api._
 import scala.concurrent.Future
 
@@ -12,68 +11,63 @@ import scala.concurrent.Future
   */
 
 case class User(name: String, password: String, email: String, role: String,
-                uid: String = java.util.UUID.randomUUID().toString,
+                token: Option[String] = Some(java.util.UUID.randomUUID.toString),
                 id: Option[Int] = None)
 
 object User {
 
-  implicit val userFormat = (
-      (__ \ "name").format[String] and
-      (__ \ "password").format[String] and
-      (__ \ "email").format[String] and
-      (__ \ "role").format[String] and
-      (__ \ "uid").format[String] and
-      (__ \ "id").formatNullable[Int]
-    ) (User.apply, unlift(User.unapply))
-}
+  implicit val userFormat = Json.format[User]
 
-class UserTable(tag: Tag) extends Table[User](tag, "User") {
-  def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+  protected class UserTable(tag: Tag) extends Table[User](tag, "User") {
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
 
-  def name = column[String]("name")
+    def name = column[String]("name")
 
-  def password = column[String]("password")
+    def password = column[String]("password")
 
-  def email = column[String]("email")
+    def email = column[String]("email")
 
-  def role = column[String]("role")
+    def role = column[String]("role")
 
-  def uid = column[String]("uid")
+    def token = column[String]("token")
 
-  def * = (name, password, email, role, uid, id.?) <>((User.apply _).tupled, User.unapply)
-}
+    def * = (name, password, email, role, token.?, id.?) <>((User.apply _).tupled, User.unapply)
 
-object UserDAO extends GenericDAO[User, Int] {
+    def roleKey = foreignKey("value", role, Role.DAO.roleQuery)(_.value)
+  }
 
-  val userQuery = TableQuery[UserTable]
+  object DAO extends GenericDAO[User, Int] {
 
-  def db: Database = Database.forDataSource(DB.getDataSource())
+    val userQuery = TableQuery[UserTable]
 
-  db.run(DBIO.seq(
-    userQuery.schema.create,
-    userQuery.+=(User("admin", "admin", "admin@test.ru", "admin")),
-    userQuery.+=(User("user", "user", "user@test.ru", "user"))
-  ))
+    val db: Database = Database.forDataSource(DB.getDataSource())
 
-  override def create(entity: User): Future[Int] =
-    db.run((userQuery returning userQuery.map(_.id)) += entity)
+    db.run(DBIO.seq(
+      userQuery.schema.create,
+      userQuery.+=(User("admin", "admin", "admin@test.ru", Role.Admin.toString)),
+      userQuery.+=(User("user", "user", "user@test.ru", Role.User.toString))
+    ))
 
-  override def update(id: Int, entity: User): Future[Int] =
-    db.run(userQuery.filter(_.id === id).update(entity))
+    override def create(entity: User): Future[Int] =
+      db.run((userQuery returning userQuery.map(_.id)) += entity)
 
-  override def delete(id: Int): Future[Int] =
-    db.run(userQuery.filter(_.id === id).delete)
+    override def update(id: Int, entity: User): Future[Int] =
+      db.run(userQuery.filter(_.id === id).update(entity))
 
-  override def read(id: Int): Future[User] =
-    db.run(userQuery.filter(_.id === id).result.head)
+    override def delete(id: Int): Future[Int] =
+      db.run(userQuery.filter(_.id === id).delete)
 
-  override def read: Future[Seq[User]] =
-    db.run(userQuery.result)
+    override def read(id: Int): Future[User] =
+      db.run(userQuery.filter(_.id === id).result.head)
 
-  def getByEmail(email: String): Future[Option[User]] =
-    db.run(userQuery.filter(_.email === email).result.headOption)
+    override def read: Future[Seq[User]] =
+      db.run(userQuery.result)
 
-  def getByUID(uid: String): Future[Option[User]] =
-    db.run(userQuery.filter(_.uid === uid).result.headOption)
+    def getByEmail(email: String): Future[Option[User]] =
+      db.run(userQuery.filter(_.email === email).result.headOption)
 
+    def getByToken(token: String): Future[Option[User]] =
+      db.run(userQuery.filter(_.token === token).result.headOption)
+
+  }
 }

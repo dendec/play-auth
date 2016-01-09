@@ -1,6 +1,6 @@
 package controllers
 
-import model.{UserDAO, User}
+import model.User
 import play.api.mvc._
 
 import scala.concurrent.Future
@@ -28,7 +28,7 @@ trait Authentication {
 object AuthUtils {
   def parseUserFromCookie(implicit request: RequestHeader): Future[Option[User]] =
     request.session.get("uid") match {
-      case Some(uid) => UserDAO.getByUID(uid)
+      case Some(uid) => User.DAO.getByToken(uid)
       case None => Future(None)
     }
 
@@ -38,7 +38,7 @@ object AuthUtils {
     val maybePassword = query get "password"
 
     (maybeEmail, maybePassword) match {
-      case (Some(email), Some(password)) => UserDAO.getByEmail(email).map { maybeUser =>
+      case (Some(email), Some(password)) => User.DAO.getByEmail(email).map { maybeUser =>
         maybeUser.filter(user => user.password.equals(password))
       }
       case _ => parseUserFromCookie
