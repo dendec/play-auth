@@ -4,7 +4,7 @@ import controllers.RegistrationEntity
 import model.{Role, User}
 import play.api.Logger
 import play.api.data.Form
-import utils.ApplicationMessage
+import utils.{EncryptionHelper, ApplicationMessage}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,7 +27,7 @@ object RegistrationService {
           case None =>
             val user = User(registrationEntity.name, registrationEntity.password, registrationEntity.email, Role.User.toString)
             Logger.info(ApplicationMessage.Info.USER_REGISTERED(user.email))
-            User.DAO.create(user)
+            register(user)
         }
       } else {
         Logger.warn(ApplicationMessage.Error.DIFFERENT_PASSWORDS)
@@ -39,4 +39,6 @@ object RegistrationService {
     }
   }
 
+  def register(user: User) =
+    User.DAO.create(user.copy(password = EncryptionHelper.makeHash(user.password, user.email)))
 }

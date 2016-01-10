@@ -8,7 +8,7 @@ import java.security.MessageDigest
   */
 object EncryptionHelper {
 
-  private val HASH_ITERATIONS = 500
+  private val HASH_ITERATIONS = 200000
   private val messageDigest = MessageDigest.getInstance("SHA-256")
 
   def generateToken = java.util.UUID.randomUUID.toString

@@ -12,36 +12,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait Authentication {
   self: Controller =>
 
-  def AuthenticateAction(getResult: (Option[User], RequestHeader) => Result) = Action.async { implicit request =>
-    authenticate(getResult.curried.andThen(f => Future(f.apply(request))), request)
-  }
+    def AuthenticateAction(getResult: (Option[User], RequestHeader) => Result) = Action.async { implicit request =>
+      Authentication.parseUserFromRequest(request).map(getResult(_, request))
+    }
 
-  def AuthenticateActionAsync(getResult: (Option[User], Request[_]) => Future[Result]) = Action.async { implicit request =>
-    authenticate(getResult(_, request), request)
-  }
-
-  def authenticate(getResult: (Option[User]) => Future[Result], request: RequestHeader) =
-    AuthUtils.parseUserFromRequest(request).flatMap(getResult)
+    def AuthenticateActionAsync(getResult: (Option[User], Request[_]) => Future[Result]) = Action.async { implicit request =>
+      Authentication.parseUserFromRequest(request).flatMap(getResult(_, request))
+    }
 
 }
 
-object AuthUtils {
-  def parseUserFromCookie(implicit request: RequestHeader): Future[Option[User]] =
-    request.session.get("uid") match {
+object Authentication {
+
+  val SESSION_TOKEN_KEY = "token"
+
+  def parseUserFromRequest(implicit request: RequestHeader): Future[Option[User]] =
+    request.session.get(SESSION_TOKEN_KEY) match {
       case Some(uid) => User.DAO.getByToken(uid)
       case None => Future(None)
     }
-
-  def parseUserFromRequest(implicit request: RequestHeader): Future[Option[User]] = {
-    val query = request.queryString.map { case (k, v) => k -> v.mkString }
-    val maybeEmail = query get "email"
-    val maybePassword = query get "password"
-
-    (maybeEmail, maybePassword) match {
-      case (Some(email), Some(password)) => User.DAO.getByEmail(email).map { maybeUser =>
-        maybeUser.filter(user => user.password.equals(password))
-      }
-      case _ => parseUserFromCookie
-    }
-  }
 }

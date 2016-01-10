@@ -15,7 +15,6 @@ class UserController extends Controller with Authentication {
 
   def create = Action.async(parse.json) { request =>
     val user = request.body.as[User]
-    println(user)
     User.DAO.create(user.copy(token = Some(EncryptionHelper.generateToken))).map(result => Ok(Json.toJson(result))).recover {
       case ex => InternalServerError(ex.getMessage)
     }

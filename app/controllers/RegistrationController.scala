@@ -1,10 +1,8 @@
 package controllers
 
-import model.{Role, User}
-import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{Controller, Result, Action}
+import play.api.mvc.{Controller, Action}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import service.RegistrationService
@@ -18,7 +16,7 @@ import scala.util.{Failure, Success}
   */
 case class RegistrationEntity(name: String, email: String, password: String, passwordConfirm: String)
 
-class RegistrationController extends Controller with Authentication {
+class RegistrationController extends Controller {
 
   val registerForm: Form[RegistrationEntity] = Form {
     mapping(
@@ -30,7 +28,7 @@ class RegistrationController extends Controller with Authentication {
   }
 
   def register = Action.async { implicit request =>
-    AuthUtils.parseUserFromCookie.flatMap {
+    Authentication.parseUserFromRequest.flatMap {
       case Some(user) =>
         Future(Redirect(routes.HomeController.home))
       case None =>

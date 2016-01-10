@@ -42,11 +42,7 @@ object User {
 
     val db: Database = Database.forDataSource(DB.getDataSource())
 
-    db.run(DBIO.seq(
-      userQuery.schema.create,
-      userQuery.+=(User("admin", "admin", "admin@test.ru", Role.Admin.toString)),
-      userQuery.+=(User("user", "user", "user@test.ru", Role.User.toString))
-    ))
+    db.run(userQuery.schema.create)
 
     override def create(entity: User): Future[Int] =
       db.run((userQuery returning userQuery.map(_.id)) += entity)

@@ -7,6 +7,10 @@ import play.api.data.Forms._
 import play.api.mvc._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import service.LoginService
+import utils.ApplicationMessage
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 
 /**
@@ -30,27 +34,32 @@ class LoginController extends Controller with Authentication {
       case None =>
         Ok {
           request.flash.get("auth-error") match {
-            case Some(errorMessage) => views.html.login(loginForm.withError("password", errorMessage))
+            case Some(errorMessage) => views.html.login(loginForm.withGlobalError(errorMessage))
             case None => views.html.login(loginForm)
           }
         }
     }
   }
 
-  def auth = AuthenticateAction { (maybeUser: Option[User], request: RequestHeader) =>
-    maybeUser match {
+  def auth = Action.async { implicit request =>
+    LoginService.login(loginForm.bindFromRequest()).map{
       case Some(user) =>
-        Logger.info(s"User ${user.name} authenticated")
-        Redirect(routes.HomeController.home).withSession("uid" -> user.token.get)
+        Logger.info(ApplicationMessage.Info.USER_LOGIN(user.email))
+        Redirect(routes.HomeController.home).withSession(Authentication.SESSION_TOKEN_KEY -> user.token.get)
       case None =>
-        Logger.warn("Access denied")
+        Logger.warn(ApplicationMessage.Error.AUTH_ERROR)
         Redirect(routes.LoginController.login).flashing(
-          "auth-error" -> "invalid login or password")
+          "auth-error" -> ApplicationMessage.Error.AUTH_ERROR)
     }
   }
 
-  def logout = Action {
-    Redirect(routes.HomeController.home).withNewSession
+  def logout = AuthenticateActionAsync { (maybeUser: Option[User], request: RequestHeader) =>
+    maybeUser match {
+      case Some(user) =>
+        LoginService.logout(user).map(_ => Redirect(routes.LoginController.login).withNewSession)
+      case None =>
+        Future(Redirect(routes.LoginController.login).withNewSession)
+    }
   }
 
 }

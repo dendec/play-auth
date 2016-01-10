@@ -8,11 +8,13 @@ object ApplicationMessage {
     val DUPLICATE_EMAIL = "User with this e-mail already exists"
     val DIFFERENT_PASSWORDS = "Entered passwords should be equal"
     val INVALID_REGISTRATION = "Invalid registration form"
+    val AUTH_ERROR = "Invalid login or password"
   }
 
   object Info {
     def ATTEMPT_TO_REGISTER(username: String) = s"Attempt to register: $username"
     def USER_REGISTERED(username: String) = s"User $username registered"
+    def USER_LOGIN(username: String) = s"User $username logged in"
   }
 
 }
