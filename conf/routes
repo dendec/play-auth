@@ -2,13 +2,15 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.HomeController.home
+GET     /                           controllers.HomeController.index
+GET     /users                      controllers.HomeController.users
+
 GET     /login                      controllers.LoginController.login
-GET     /auth                       controllers.LoginController.auth
+POST    /auth                       controllers.LoginController.auth
 GET     /logout                     controllers.LoginController.logout
 GET     /register                   controllers.RegistrationController.register
 POST    /register                   controllers.RegistrationController.register
+
 POST    /api/user/create            controllers.api.UserController.create
 POST    /api/user/update/:id        controllers.api.UserController.update(id: Int)
 GET     /api/user/:id               controllers.api.UserController.read(id: Int)

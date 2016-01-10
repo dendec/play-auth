@@ -1,0 +1,26 @@
+@(me: model.User, users: Seq[model.User])
+
+@home.index(me) {
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Token</th>
+        </tr>
+        </thead>
+        <tbody>
+            @for(user <- users) {
+            <tr>
+                <td>@user.id.get</td>
+                <td>@user.name</td>
+                <td>@user.email</td>
+                <td>@user.role</td>
+                <td>@user.token</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}

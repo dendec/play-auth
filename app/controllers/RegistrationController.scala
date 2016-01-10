@@ -30,7 +30,7 @@ class RegistrationController extends Controller {
   def register = Action.async { implicit request =>
     Authentication.parseUserFromRequest.flatMap {
       case Some(user) =>
-        Future(Redirect(routes.HomeController.home))
+        Future(Redirect(routes.HomeController.index))
       case None =>
         request.method match {
           case "GET" =>

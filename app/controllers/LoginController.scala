@@ -30,7 +30,7 @@ class LoginController extends Controller with Authentication {
 
   def login = AuthenticateAction { (maybeUser: Option[User], request: RequestHeader) =>
     maybeUser match {
-      case Some(user) => Redirect(routes.HomeController.home)
+      case Some(user) => Redirect(routes.HomeController.index)
       case None =>
         Ok {
           request.flash.get("auth-error") match {
@@ -45,7 +45,7 @@ class LoginController extends Controller with Authentication {
     LoginService.login(loginForm.bindFromRequest()).map{
       case Some(user) =>
         Logger.info(ApplicationMessage.Info.USER_LOGIN(user.email))
-        Redirect(routes.HomeController.home).withSession(Authentication.SESSION_TOKEN_KEY -> user.token.get)
+        Redirect(routes.HomeController.index).withSession(Authentication.SESSION_TOKEN_KEY -> user.token.get)
       case None =>
         Logger.warn(ApplicationMessage.Error.AUTH_ERROR)
         Redirect(routes.LoginController.login).flashing(

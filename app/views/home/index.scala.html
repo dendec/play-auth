@@ -1,4 +1,4 @@
-@(user: model.User)
+@(me: model.User)(content: Html)
 
 @main("Home") {
     <div class="container-fluid">
@@ -7,11 +7,17 @@
                 <div class="list-group">
                     <a href="@routes.LoginController.logout()" class="list-group-item">Logout</a>
                 </div>
+                @if(me.role.equals(model.Role.Admin.toString)) {
+                <div class="list-group">
+                    <a href="@routes.HomeController.users()" class="list-group-item">Users</a>
+                </div>
+                }
             </div>
             <div class="col-xs-12 col-md-8">
                 <div class="jumbotron">
-                    <h1>Hello, @user.name</h1>
+                    <h1>Hello, @me.name</h1>
                 </div>
+                @content
             </div>
         </div>
     </div>

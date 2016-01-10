@@ -3,17 +3,17 @@
 @import helper._
 
 @main("Register") {
-<div class="container">
-    <form class="form-register" action="@routes.RegistrationController.register()" method="POST">
-        <h2 class="form-signin-heading">Register:</h2>
-        @inputText(registerForm("name"), 'class -> "form-control", '_showConstraints -> false)
-        @inputText(registerForm("email"), 'class -> "form-control", 'type -> "email", '_showConstraints -> false)
-        @inputPassword(registerForm("password"), 'class -> "form-control", 'type -> "password", 'required -> "", '_label -> "password", '_showConstraints -> false)
-        @inputPassword(registerForm("password_confirm"), 'class -> "form-control", 'type -> "password", 'required -> "", '_label -> "confirm password", '_showConstraints -> false)
-        <button class="btn btn-large btn-primary" type="submit">Sign in</button>
-        @if(registerForm.hasGlobalErrors) {
-            <p>@registerForm.globalErrors.head.message</p>
-        }
-    </form>
-</div>
+    <div class="container">
+        <form class="form-register" action="@routes.RegistrationController.register()" method="POST">
+            <h2 class="form-signin-heading">Register:</h2>
+            @inputText(registerForm("name"), 'class -> "form-control", '_showConstraints -> false)
+            @inputText(registerForm("email"), 'class -> "form-control", 'type -> "email", '_showConstraints -> false)
+            @inputPassword(registerForm("password"), 'class -> "form-control", 'type -> "password", 'required -> "", '_label -> "password", '_showConstraints -> false)
+            @inputPassword(registerForm("password_confirm"), 'class -> "form-control", 'type -> "password", 'required -> "", '_label -> "confirm password", '_showConstraints -> false)
+            <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+            @if(registerForm.hasGlobalErrors) {
+                <p>@registerForm.globalErrors.head.message</p>
+            }
+        </form>
+    </div>
 }

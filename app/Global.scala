@@ -21,9 +21,12 @@ object Global extends GlobalSettings {
     Future(BadRequest(views.html.error(new Exception(error))))
   }
 
-  override def onStart(app: Application) = {
-    RegistrationService.register(User("admin", "admin", "admin@test.com", Role.Admin.toString))
-    RegistrationService.register(User("user", "user", "user@test.com", Role.User.toString))
-  }
+  //create some users for test purposes
+  override def onStart(app: Application) =
+    User.DAO.getByEmail("admin@test.com").map {
+      case Some(_) =>
+      case None =>
+        RegistrationService.register(User("admin", "admin", "admin@test.com", Role.Admin.toString))
+    }
 
 }
