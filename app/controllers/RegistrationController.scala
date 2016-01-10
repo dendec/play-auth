@@ -9,7 +9,7 @@ import service.RegistrationService
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import play.api.Logger
 
 /**
   * Created by denis on 09.01.16.
@@ -36,10 +36,13 @@ class RegistrationController extends Controller {
           case "GET" =>
             Future(Ok(views.html.register(registerForm)))
           case "POST" =>
-            RegistrationService.register(registerForm.bindFromRequest()) match {
-              case Success(result) => result.map(_ => Redirect(routes.LoginController.login))
-              case Failure(ex) => Future(BadRequest(views.html.register(registerForm.withGlobalError(ex.getMessage))))
-            }
+            val filledRegisterForm = registerForm.bindFromRequest()
+            RegistrationService.register(filledRegisterForm).map(_ => Redirect(routes.LoginController.login)).
+              recover {
+                case ex =>
+                  Logger.warn(ex.getMessage)
+                  BadRequest(views.html.register(filledRegisterForm.withGlobalError(ex.getMessage)))
+              }
         }
     }
   }

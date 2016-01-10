@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by denis on 02.01.16.
   */
-class UserController extends Controller with Authentication {
+class UserController extends Controller {
 
   def create = Action.async(parse.json) { request =>
     val user = request.body.as[User]

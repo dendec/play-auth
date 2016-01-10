@@ -6,14 +6,12 @@
     <div class="container">
         <form class="form-signin" action="@routes.LoginController.auth()" method="POST">
             <h2 class="form-signin-heading">Login:</h2>
-            @inputText(loginForm("email"), 'class -> "form-control", 'type -> "email")
-            @inputPassword(loginForm("password"), 'class -> "form-control", 'type -> "password", 'required -> "")
+            @inputText(loginForm("email"), 'class -> "form-control", 'required -> "")
+            @inputPassword(loginForm("password"), 'class -> "form-control", 'required -> "")
             <button class="btn btn-large btn-primary" type="submit">Sign in</button>
             <a href="@routes.RegistrationController.register()">Register</a>
             @if(loginForm.hasGlobalErrors) {
-                <p>
-                    @loginForm.globalErrors.head.message
-                </p>
+            <div>@loginForm.globalErrors.head.message</div>
             }
         </form>
     </div>
