@@ -35,7 +35,7 @@ class LoginController extends Controller with Authentication {
         Ok {
           request.flash.get("auth-error") match {
             case Some(errorMessage) => views.html.login(loginForm.withGlobalError(errorMessage))
-            case None => views.html.login(loginForm.fill(LoginEntity("admin@test.com", "admin")))
+            case None => views.html.login(loginForm)
           }
         }
     }
